@@ -30,7 +30,7 @@ class StatusBarAlert extends Component {
           Animated.timing(
             this.state.height,
             {
-              toValue: this.props.statusbarHeight * 2,
+              toValue: this.props.statusbarHeight + this.props.alertHeight,
               duration: SLIDE_DURATION
             }
           ),
@@ -67,6 +67,7 @@ class StatusBarAlert extends Component {
       }
     }, PULSE_DURATION)
     if (this.props.statusbarHeight) STATUS_BAR_HEIGHT = this.props.statusbarHeight
+    if (this.props.alertHeight) ALERT_HEIGHT = this.props.alertHeight
   }
 
   componentWillUnmount() {
@@ -82,7 +83,7 @@ class StatusBarAlert extends Component {
             Animated.timing(
               this.state.height,
               {
-                toValue: nextProps.statusbarHeight * 2,
+                toValue: nextProps.statusbarHeight + nextProps.alertHeight,
                 duration: SLIDE_DURATION
               }
             ),
@@ -119,13 +120,15 @@ class StatusBarAlert extends Component {
       }
     }
     if (this.props.statusbarHeight) STATUS_BAR_HEIGHT = this.props.statusbarHeight
+    if (this.props.alertHeight) ALERT_HEIGHT = this.props.alertHeight
   }
 
   render() {
     return (
-      <Animated.View style={[styles.view, {
+      <Animated.View style={[styles.view, this.props.zIndex && styles.absoluteView, {
         height: this.state.height,
         opacity: this.state.opacity,
+        zIndex: this.props.zIndex,
         backgroundColor: this.props.pulse === 'background' ? this.state.pulse.interpolate({
           inputRange: [0, 1],
           outputRange: [this.props.backgroundColor, this.props.highlightColor || saturate(this.props.backgroundColor, SATURATION)]
@@ -153,6 +156,7 @@ class StatusBarAlert extends Component {
 }
 
 let STATUS_BAR_HEIGHT = 20
+let ALERT_HEIGHT = 20
 const PULSE_DURATION = 1000
 const SLIDE_DURATION = 300
 const ACTIVE_OPACITY = 0.6
@@ -161,15 +165,21 @@ const SATURATION = 0.9
 
 const styles = {
   view: {
-    height: STATUS_BAR_HEIGHT * 2,
+    height: STATUS_BAR_HEIGHT + ALERT_HEIGHT,
     backgroundColor: saturate('#3DD84C', SATURATION)
+  },
+  absoluteView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0
   },
   touchableOpacity: {
     flex: 1,
     justifyContent: 'flex-end'
   },
   text: {
-    height: STATUS_BAR_HEIGHT,
+    height: ALERT_HEIGHT,
     fontSize: 13,
     fontWeight: '400',
     lineHeight: 15,
@@ -186,6 +196,8 @@ StatusBarAlert.propTypes = {
   highlightColor: PropTypes.string,
   color: PropTypes.string,
   statusbarHeight: PropTypes.number,
+  alertHeight: PropTypes.number,
+  zIndex: PropTypes.number,
   onPress: PropTypes.func
 }
 
@@ -197,6 +209,8 @@ StatusBarAlert.defaultProps = {
   highlightColor: null,
   color: styles.text.color,
   statusbarHeight: STATUS_BAR_HEIGHT,
+  alertHeight: ALERT_HEIGHT,
+  zIndex: null,
   onPress: null
 }
 
